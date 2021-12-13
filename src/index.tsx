@@ -17,6 +17,7 @@ const Esp = NativeModules.Esp
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return Esp.multiply(a, b);
-}
+export const scanBleDevices = async (prefix?: string): Promise<any[]> => {
+  const result = await Esp.scanBleDevices(prefix);
+  return result;
+};
