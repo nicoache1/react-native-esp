@@ -21,3 +21,34 @@ export const scanBleDevices = async (prefix?: string): Promise<any[]> => {
   const result = await Esp.scanBleDevices(prefix);
   return result;
 };
+
+export const connectToDevice = async (
+  deviceAddress: String,
+  deviceProofOfPossession: String,
+  mainServiceUUID?: String
+): Promise<any[]> => {
+  let result;
+  if (Platform.OS === 'ios') {
+    result = await Esp.connectToDevice(deviceAddress, deviceProofOfPossession);
+  } else {
+    result = await Esp.connectToDevice(
+      deviceAddress,
+      deviceProofOfPossession,
+      mainServiceUUID
+    );
+  }
+  return result;
+};
+
+export const scanWifiList = async (): Promise<any[]> => {
+  const result = await Esp.scanWifiList();
+  return result;
+};
+
+export const provisionDevice = async (
+  ssid: String,
+  passPhrase: String
+): Promise<any[]> => {
+  const result = await Esp.provision(ssid, passPhrase);
+  return result;
+};

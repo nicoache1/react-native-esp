@@ -1,5 +1,16 @@
-import { StyleSheet, View, Text, Platform } from 'react-native';
-import { scanBleDevices } from 'react-native-esp';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Platform,
+  Pressable,
+  Alert,
+} from 'react-native';
+import {
+  scanBleDevices,
+  connectToDevice,
+  scanWifiList,
+} from 'react-native-esp';
 import React, { useEffect, useState } from 'react';
 import { request, PERMISSIONS } from 'react-native-permissions';
 
@@ -18,14 +29,29 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     justifyContent: 'center',
   },
+  scanButton: {
+    height: 70,
+    marginHorizontal: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+  },
+  separator: {
+    borderBottomWidth: 1,
+    borderBottomColor: 'black',
+  },
 });
 
 export default function App() {
   const [foundDevices, setFoundDevices] = useState<any[]>([]);
+  const [connectedDevice, setConnectedDevice] = useState<any>(undefined);
+  const [wifiList, setWifiList] = useState<any[]>([]);
 
   useEffect(() => {
     async function getBleDevices() {
       console.log('GetBLEDevices: Start');
+      // TODO: ANDROID 12
       if (Platform.OS === 'android') {
         await request(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
       } else {
@@ -48,15 +74,51 @@ export default function App() {
   }, []);
 
   const existDevices = foundDevices.length !== 0;
+  const existWifi = wifiList.length !== 0;
+
+  const onPressDevice = (item: any) => async () => {
+    try {
+      const result = await connectToDevice(item.address, 'abcd1234');
+      Alert.alert(`Connected to ${item.name} - with result: ${result}`);
+      setConnectedDevice(item);
+    } catch (error) {
+      Alert.alert('Error', JSON.stringify(error));
+    }
+  };
+
+  const onPressScan = async () => {
+    try {
+      const result = await scanWifiList();
+      Alert.alert(`Scanned ${result.length} networks`);
+      setWifiList(result);
+    } catch (error) {
+      Alert.alert('Error', JSON.stringify(error));
+    }
+  };
 
   return (
     <View style={styles.container}>
       {!existDevices && <Text>No devices found</Text>}
+      {connectedDevice && (
+        <Pressable style={styles.scanButton} onPress={onPressScan}>
+          <Text>Scan Wifi List</Text>
+        </Pressable>
+      )}
       {existDevices &&
         foundDevices.map((item) => (
-          <View style={styles.item}>
+          <Pressable style={styles.item} onPress={onPressDevice(item)}>
+            <Text>{`Name - ${item.name}`}</Text>
+            <Text>{`Address - ${item.address}`}</Text>
+          </Pressable>
+        ))}
+      <View style={styles.separator} />
+      {existWifi &&
+        wifiList.map((item) => (
+          <Pressable style={styles.item} onPress={onPressDevice(item)}>
             <Text>{item.name}</Text>
-          </View>
+            <Text>{item.rssi}</Text>
+            <Text>{item.security}</Text>
+          </Pressable>
         ))}
     </View>
   );
