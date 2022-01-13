@@ -10,6 +10,8 @@ import {
   scanBleDevices,
   connectToDevice,
   scanWifiList,
+  BleDevices,
+  WifiDevices,
 } from 'react-native-esp';
 import React, { useEffect, useState } from 'react';
 import { request, PERMISSIONS } from 'react-native-permissions';
@@ -44,9 +46,11 @@ const styles = StyleSheet.create({
 });
 
 export default function App() {
-  const [foundDevices, setFoundDevices] = useState<any[]>([]);
-  const [connectedDevice, setConnectedDevice] = useState<any>(undefined);
-  const [wifiList, setWifiList] = useState<any[]>([]);
+  const [foundDevices, setFoundDevices] = useState<BleDevices[]>([]);
+  const [connectedDevice, setConnectedDevice] = useState<
+    BleDevices | undefined
+  >(undefined);
+  const [wifiList, setWifiList] = useState<WifiDevices[]>([]);
 
   useEffect(() => {
     async function getBleDevices() {

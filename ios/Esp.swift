@@ -70,7 +70,7 @@ class Esp: NSObject {
 
                 switch status {
                 case .connected:
-                    resolve(status)
+                    resolve("Connection success")
                 case let .failedToConnect(error):
                     reject("\(error.code)", error.description, error)
                 default:

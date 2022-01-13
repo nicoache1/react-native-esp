@@ -95,7 +95,7 @@ class EspModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaMod
 
       esp.connectBLEDevice(device, mainUUID);
 
-      promise.resolve(esp.deviceName);
+      promise.resolve("Connection success");
     }
 
     @ReactMethod
